@@ -1711,8 +1711,24 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // =========================================================================
+        // KONFIGURASI FIREBASE ANDA
+        // =========================================================================
+        const myFirebaseConfig = {
+            apiKey: "AIzaSyDWwx7wO2HBu0IPIBd_-T1VCQQDcly2ct4",
+            authDomain: "turnamen-mlbb-aja.firebaseapp.com",
+            databaseURL: "https://turnamen-mlbb-aja-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "turnamen-mlbb-aja",
+            storageBucket: "turnamen-mlbb-aja.firebasestorage.app",
+            messagingSenderId: "560846679744",
+            appId: "1:560846679744:web:27c93f6456586d3ff28725"
+        };
+        // =========================================================================
+
+        // Deteksi apakah user sudah memasukkan config sendiri atau belum
+        const isUsingCustomFirebase = myFirebaseConfig.apiKey !== "API_KEY_ANDA";
+        const firebaseConfig = isUsingCustomFirebase ? myFirebaseConfig : (typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'mlbb-aja-cup-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         
         if (firebaseConfig) {
             const app = initializeApp(firebaseConfig);
@@ -1720,7 +1736,10 @@
             const auth = getAuth(app);
             let currentUser = null;
             
-            const stateDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'tournament', 'globalState');
+            // Path penyimpanan data. Jika pakai Firebase sendiri, simpan di koleksi 'turnamen_mlbb'
+            const stateDocRef = isUsingCustomFirebase 
+                ? doc(db, 'turnamen_mlbb', 'globalState') 
+                : doc(db, 'artifacts', appId, 'public', 'data', 'tournament', 'globalState');
 
             window.saveStateToCloud = async function(newState) {
                 if (!currentUser) return;
@@ -1737,13 +1756,17 @@
 
             const initAuth = async () => {
                 try {
-                    if (typeof __initial_auth_token !== 'undefined') {
+                    if (isUsingCustomFirebase) {
+                        // Jika menggunakan Firebase milik sendiri, wajib pakai Anonymous Auth
+                        await signInAnonymously(auth);
+                    } else if (typeof __initial_auth_token !== 'undefined') {
                         await signInWithCustomToken(auth, __initial_auth_token);
                     } else {
                         await signInAnonymously(auth);
                     }
                 } catch (error) {
                     console.error("Auth error:", error);
+                    if(window.showToast) window.showToast("Gagal konek Firebase! Pastikan Anonymous Auth aktif.", true);
                 }
             };
 
@@ -1759,19 +1782,19 @@
                             if(data.matches) window.state.matches = data.matches;
                             if(data.registrationDeadline !== undefined) window.state.registrationDeadline = data.registrationDeadline;
                             
-                            // Render ulang seluruh UI agar sinkron dengan layar pengguna lain
+                            // Render ulang seluruh UI agar sinkron
                             if(window.renderTeams) window.renderTeams();
                             if(window.renderBracket) window.renderBracket();
                             if(window.renderStats) window.renderStats();
                             if(window.updateQuotaUI) window.updateQuotaUI();
                             
-                            // Perbarui form input pertandingan secara live jika ada admin lain yang sedang mengedit
+                            // Perbarui form input pertandingan secara live
                             if(window.refreshModalState && window.currentSelectedMatch) {
                                 window.currentSelectedMatch = window.state.matches.find(m => m.id === window.currentSelectedMatch.id);
                                 if(window.currentSelectedMatch) window.refreshModalState();
                             }
                         } else {
-                            // Jika cloud masih kosong, unggah data awal
+                            // Jika cloud kosong (pertama kali), unggah state kosong
                             setDoc(stateDocRef, {
                                 teams: window.state.teams,
                                 matches: window.state.matches,
