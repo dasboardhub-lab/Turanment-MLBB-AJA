@@ -962,7 +962,13 @@
                     <div class="flex justify-between items-center bg-slate-900 px-3 py-2 rounded mb-1 border ${p.isSub ? 'border-slate-700 border-dashed opacity-80' : 'border-slate-700'}">
                         <div class="flex flex-col">
                             <span class="font-bold text-sm text-white">${p.ign} <span class="text-[10px] font-normal text-slate-400">(${p.name})</span></span>
-                            <span class="text-[10px] text-brand-magenta">${p.hub} ${p.nik ? `| ${p.nik}` : ''}</span>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span class="text-[10px] text-slate-400">ID: <span class="text-white">${p.mlbbId}</span></span>
+                                <button onclick="copyMLBBID('${p.mlbbId}')" class="text-brand-accent hover:text-brand-magenta cursor-pointer transition-colors" title="Salin ID MLBB">
+                                    <i class="fa-regular fa-copy text-[11px]"></i>
+                                </button>
+                            </div>
+                            <span class="text-[10px] text-brand-magenta mt-0.5">${p.hub} ${p.nik ? `| ${p.nik}` : ''}</span>
                         </div>
                         <div class="flex flex-col items-end">
                             <span class="text-[10px] px-2 py-0.5 ${p.isSub ? 'bg-slate-700 text-slate-300' : 'bg-brand-magenta/20 text-brand-magenta'} rounded font-semibold mb-1">${p.isSub ? 'Cadangan' : 'Inti'}</span>
@@ -983,7 +989,7 @@
                     // Format nomor WA agar bisa diklik (ubah angka 0 di depan jadi 62)
                     if (team.waKapten) {
                         let waNum = team.waKapten.replace(/^0/, '62').replace(/\D/g, '');
-                        waInfo = `<a href="https://wa.me/${waNum}" target="_blank" class="text-[11px] text-green-400 hover:text-green-300 flex items-center gap-1 mt-1" title="Undang ke Grup WA"><i class="fa-brands fa-whatsapp text-sm"></i> ${team.waKapten}</a>`;
+                        waInfo = `<a href="https://wa.me/${waNum}" target="_blank" class="text-[11px] text-green-400 hover:text-green-300 flex items-center gap-1 mt-1" title="Hubungi via WA"><i class="fa-brands fa-whatsapp text-sm"></i> ${team.waKapten}</a>`;
                     }
                 }
 
