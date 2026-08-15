@@ -886,9 +886,32 @@
             syncState();
             updateQuotaUI();
 
-            showToast(`Tim ${teamName} berhasil didaftarkan!`);
+            // Ubah logika setelah klik daftar (jangan langsung redirect, tapi munculkan popup)
             document.getElementById('registration-form').reset();
-            showView('teams');
+            document.getElementById('success-team-name').textContent = teamName;
+            
+            // Panggil modal success
+            const modal = document.getElementById('success-register-modal');
+            const box = document.getElementById('success-register-box');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; // Trigger reflow animasi
+            modal.classList.remove('opacity-0');
+            box.classList.remove('scale-95');
+        }
+
+        // Fungsi untuk menutup modal sukses pendaftaran dan pindah ke halaman tim
+        function closeSuccessRegisterModal() {
+            const modal = document.getElementById('success-register-modal');
+            const box = document.getElementById('success-register-box');
+            
+            modal.classList.add('opacity-0');
+            box.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                showView('teams');
+                showToast("Pendaftaran tim berhasil diselesaikan.");
+            }, 300);
         }
 
         // --- TEAM DELETE FEATURE FOR ADMIN ---
@@ -950,20 +973,29 @@
 
                 // Tombol Hapus khusus Panitia
                 let adminDeleteBtn = '';
+                let waInfo = '';
                 if (state.isAdmin) {
                     adminDeleteBtn = `
                         <button onclick="deleteTeam('${team.id}')" class="bg-red-500/20 hover:bg-red-500/40 text-red-300 text-xs px-3 py-1.5 rounded flex items-center gap-1 transition-colors border border-red-500/30">
                             <i class="fa-solid fa-trash"></i> Hapus Tim
                         </button>
                     `;
+                    // Format nomor WA agar bisa diklik (ubah angka 0 di depan jadi 62)
+                    if (team.waKapten) {
+                        let waNum = team.waKapten.replace(/^0/, '62').replace(/\D/g, '');
+                        waInfo = `<a href="https://wa.me/${waNum}" target="_blank" class="text-[11px] text-green-400 hover:text-green-300 flex items-center gap-1 mt-1" title="Undang ke Grup WA"><i class="fa-brands fa-whatsapp text-sm"></i> ${team.waKapten}</a>`;
+                    }
                 }
 
                 grid.innerHTML += `
                     <div class="glass-panel rounded-xl overflow-hidden shadow-lg border border-slate-700 transition-all hover:border-brand-magenta flex flex-col justify-between">
                         <div>
-                            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-5 py-4 border-b border-brand-magenta/30 flex justify-between items-center">
-                                <h3 class="font-bold text-xl text-white truncate"><i class="fa-solid fa-shield text-brand-magenta mr-2"></i>${team.name}</h3>
-                                <span class="text-xs bg-slate-800 px-2 py-1 rounded text-slate-300 border border-slate-600">${team.players.length} Anggota</span>
+                            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-5 py-4 border-b border-brand-magenta/30 flex justify-between items-start">
+                                <div class="w-3/4">
+                                    <h3 class="font-bold text-xl text-white truncate" title="${team.name}"><i class="fa-solid fa-shield text-brand-magenta mr-2"></i>${team.name}</h3>
+                                    ${waInfo}
+                                </div>
+                                <span class="text-xs bg-slate-800 px-2 py-1 rounded text-slate-300 border border-slate-600 shrink-0">${team.players.length} Anggota</span>
                             </div>
                             <div class="p-4">
                                 ${playersHTML}
