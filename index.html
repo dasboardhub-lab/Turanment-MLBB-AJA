@@ -295,6 +295,9 @@
                     <button onclick="applySpecificSchedule()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-lg"></i> Pasang Jadwal Draft WA (18-20 Ags)
                     </button>
+                    <button onclick="rescheduleUnplayedMatches()" class="bg-amber-600 hover:bg-amber-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(217,119,6,0.4)] transition-all border border-amber-500 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Jadwal Ulang Sisa Match
+                    </button>
                     <button onclick="generatePlayoffs()" class="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(147,51,234,0.4)] transition-all border border-purple-500 flex items-center gap-2">
                         <i class="fa-solid fa-trophy"></i> Buat Playoff (Top 4)
                     </button>
@@ -518,10 +521,13 @@
                             </div>
                         </div>
 
-                        <!-- Tombol Walkover -->
-                        <div id="walkover-controls" class="flex justify-center gap-3 w-full border-t border-slate-700 pt-3 hidden">
+                        <!-- Tombol Walkover & Batal -->
+                        <div id="walkover-controls" class="flex justify-center gap-3 w-full border-t border-slate-700 pt-3 hidden flex-wrap">
                             <button onclick="setWalkover(1)" id="btn-wo-1" class="text-xs bg-red-500/20 text-red-400 hover:bg-red-500/40 px-3 py-1.5 rounded border border-red-500/30 font-bold transition-colors">
                                 <i class="fa-solid fa-flag text-red-500 mr-1"></i> WO: Menang Tim A
+                            </button>
+                            <button onclick="setDrawCancel()" class="text-xs bg-slate-500/20 text-slate-400 hover:bg-slate-500/40 px-3 py-1.5 rounded border border-slate-500/30 font-bold transition-colors">
+                                <i class="fa-solid fa-ban mr-1"></i> Batal / Tanpa Poin
                             </button>
                             <button onclick="setWalkover(2)" id="btn-wo-2" class="text-xs bg-red-500/20 text-red-400 hover:bg-red-500/40 px-3 py-1.5 rounded border border-red-500/30 font-bold transition-colors">
                                 <i class="fa-solid fa-flag text-red-500 mr-1"></i> WO: Menang Tim B
@@ -746,7 +752,6 @@
             const autoConcurrent = parseInt(document.getElementById('auto-concurrent').value) || 1;
             
             // --- Algoritma Round-Robin (Circle Method) ---
-            // Memastikan jadwal tersusun berdasarkan ronde agar tidak ada tim yang main berturut-turut.
             let roundTeams = [...state.teams];
             if (roundTeams.length % 2 !== 0) {
                 roundTeams.push({ id: null, name: 'BYE' });
@@ -780,7 +785,6 @@
                         });
                     }
                 }
-                // Rotasi array: Elemen pertama tetap, sisanya bergeser
                 const lastTeam = roundTeams.pop(); 
                 roundTeams.splice(1, 0, lastTeam); 
             }
@@ -788,12 +792,12 @@
             // --- Penjadwalan Waktu (Termasuk Paralel Match) ---
             if (autoStartTimeInput && generatedMatches.length > 0) {
                 let currentSchedule = new Date(autoStartTimeInput);
-                let slotsToday = 0; // Menghitung berapa SESI JAM yang sudah jalan hari ini
+                let slotsToday = 0; 
                 let dailyStartHours = currentSchedule.getHours();
                 let dailyStartMinutes = currentSchedule.getMinutes();
                 
-                let currentSlotMatches = 0; // Berapa match yang berjalan di jam ini
-                let currentSlotTeams = new Set(); // Melacak tim mana saja yang sedang main di jam ini
+                let currentSlotMatches = 0; 
+                let currentSlotTeams = new Set(); 
                 
                 const formatDateString = (dateObj) => {
                     const pad = n => n < 10 ? '0' + n : n;
@@ -804,29 +808,23 @@
                     const t1 = match.team1Id;
                     const t2 = match.team2Id;
 
-                    // Cek apakah match ini BISA masuk ke slot waktu saat ini tanpa bentrok
                     const canFitInSlot = (currentSlotMatches < autoConcurrent) && !currentSlotTeams.has(t1) && !currentSlotTeams.has(t2);
 
                     if (!canFitInSlot) {
-                        // Tidak muat atau bentrok tim, majukan ke SESI WAKTU berikutnya
                         slotsToday++;
                         
                         if (slotsToday >= autoSlotsPerDay) {
-                            // Sesi hari ini habis, pindah ke besok hari
                             currentSchedule.setDate(currentSchedule.getDate() + 1);
                             currentSchedule.setHours(dailyStartHours, dailyStartMinutes, 0, 0);
-                            slotsToday = 0; // reset hitungan hari ini
+                            slotsToday = 0; 
                         } else {
-                            // Tambah durasi untuk sesi berikutnya di hari yang sama
                             currentSchedule.setMinutes(currentSchedule.getMinutes() + autoDuration);
                         }
                         
-                        // Reset pelacak slot untuk sesi baru ini
                         currentSlotMatches = 0;
                         currentSlotTeams.clear();
                     }
 
-                    // Masukkan pertandingan ke slot waktu saat ini
                     match.scheduledTime = formatDateString(currentSchedule);
                     currentSlotMatches++;
                     currentSlotTeams.add(t1);
@@ -834,9 +832,7 @@
                 });
             }
 
-            // Gabungkan hasil ke state utama
             state.matches.push(...generatedMatches);
-
             syncState();
             showToast("Jadwal Liga berhasil dibuat! Termasuk opsi pertandingan paralel.");
             renderLeague();
@@ -900,11 +896,8 @@
                 "Pasang Jadwal Draft WA?",
                 "Ini akan <b>menghapus jadwal liga saat ini</b> dan menggantinya persis sesuai dengan draft teks WhatsApp (Tgl 18 - 20 Agustus). Lanjutkan?",
                 () => {
-                    // Bersihkan jadwal liga yang ada
                     state.matches = state.matches.filter(m => m.phase !== 'league');
                     
-                    // Kamus Tim sesuai ID dari Backup (Hati-hati, pastikan tim ini yang dipakai)
-                    // team-wws, team-abg, team-bgd, team-mnd, team-dgk, team-tma, team-atr
                     const draft = [
                         // 18 Ags 19:00
                         { t1: 'team-atr', t2: 'team-bgd', time: '2026-08-18T19:00' },
@@ -970,7 +963,76 @@
             );
         }
 
-        // --- WALKOVER LOGIC ---
+        function rescheduleUnplayedMatches() {
+            if (!state.isAdmin) return;
+            const autoStartTimeInput = document.getElementById('auto-start-time').value;
+            if (!autoStartTimeInput) {
+                showToast("Isi 'Waktu Mulai Match Pertama' terlebih dahulu!", true);
+                return;
+            }
+
+            const unplayedMatches = state.matches.filter(m => m.phase === 'league' && !m.isPlayed);
+            if (unplayedMatches.length === 0) {
+                showToast("Semua pertandingan sudah dimainkan!", true);
+                return;
+            }
+
+            showCustomConfirm(
+                "Jadwal Ulang Sisa Match?",
+                `Ada <b>${unplayedMatches.length} pertandingan</b> yang belum dimainkan. Sistem akan mengatur ulang jam tandingnya secara otomatis mulai dari waktu yang Anda tentukan, <b>tanpa mengubah atau menghapus</b> pertandingan yang sudah selesai dimainkan. Lanjutkan?`,
+                () => {
+                    const autoDuration = parseInt(document.getElementById('auto-duration').value) || 60;
+                    const autoSlotsPerDay = parseInt(document.getElementById('auto-matches-per-day').value) || 3;
+                    const autoConcurrent = parseInt(document.getElementById('auto-concurrent').value) || 1;
+
+                    let currentSchedule = new Date(autoStartTimeInput);
+                    let slotsToday = 0; 
+                    let dailyStartHours = currentSchedule.getHours();
+                    let dailyStartMinutes = currentSchedule.getMinutes();
+                    
+                    let currentSlotMatches = 0; 
+                    let currentSlotTeams = new Set(); 
+                    
+                    const formatDateString = (dateObj) => {
+                        const pad = n => n < 10 ? '0' + n : n;
+                        return `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}T${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
+                    };
+
+                    unplayedMatches.forEach(match => {
+                        const t1 = match.team1Id;
+                        const t2 = match.team2Id;
+
+                        const canFitInSlot = (currentSlotMatches < autoConcurrent) && !currentSlotTeams.has(t1) && !currentSlotTeams.has(t2);
+
+                        if (!canFitInSlot) {
+                            slotsToday++;
+                            
+                            if (slotsToday >= autoSlotsPerDay) {
+                                currentSchedule.setDate(currentSchedule.getDate() + 1);
+                                currentSchedule.setHours(dailyStartHours, dailyStartMinutes, 0, 0);
+                                slotsToday = 0; 
+                            } else {
+                                currentSchedule.setMinutes(currentSchedule.getMinutes() + autoDuration);
+                            }
+                            
+                            currentSlotMatches = 0;
+                            currentSlotTeams.clear();
+                        }
+
+                        match.scheduledTime = formatDateString(currentSchedule);
+                        currentSlotMatches++;
+                        currentSlotTeams.add(t1);
+                        currentSlotTeams.add(t2);
+                    });
+
+                    syncState();
+                    showToast("Sisa pertandingan berhasil dijadwalkan ulang!");
+                    renderLeague();
+                }
+            );
+        }
+
+        // --- WALKOVER & CANCEL LOGIC ---
         function setWalkover(teamIndex) {
             if (!state.isAdmin || !currentSelectedMatch) return;
             
@@ -988,9 +1050,8 @@
                     currentSelectedMatch.winnerId = winnerId;
                     currentSelectedMatch.scoreT1 = teamIndex === 1 ? targetWins : 0;
                     currentSelectedMatch.scoreT2 = teamIndex === 2 ? targetWins : 0;
-                    currentSelectedMatch.games = []; // Kosongkan statistik game
+                    currentSelectedMatch.games = []; 
 
-                    // Jika ini semi final, majukan ke final
                     if (currentSelectedMatch.phase === 'playoff' && currentSelectedMatch.name.includes('Semi Final')) {
                         const grandFinal = state.matches.find(m => m.name === 'Grand Final');
                         if(grandFinal) {
@@ -1001,6 +1062,28 @@
 
                     syncState();
                     showToast(`Kemenangan WO untuk ${winnerTeam.name} berhasil disimpan!`);
+                    closeMatchModal();
+                    renderLeague();
+                    renderStats();
+                }
+            );
+        }
+
+        function setDrawCancel() {
+            if (!state.isAdmin || !currentSelectedMatch) return;
+            
+            showCustomConfirm(
+                "Konfirmasi Batal (Tanpa Poin)",
+                `Anda yakin ingin membatalkan pertandingan ini?<br><br><span class="text-xs text-slate-400">Kedua tim akan dihitung <b>sudah bermain (+1 Main)</b> di klasemen namun <b>tidak mendapatkan poin apapun (0 Poin)</b>.</span>`,
+                () => {
+                    currentSelectedMatch.isPlayed = true;
+                    currentSelectedMatch.winnerId = null; // null indicates draw/cancelled
+                    currentSelectedMatch.scoreT1 = 0;
+                    currentSelectedMatch.scoreT2 = 0;
+                    currentSelectedMatch.games = []; 
+
+                    syncState();
+                    showToast(`Pertandingan dibatalkan (Kedua tim 0 Poin)!`);
                     closeMatchModal();
                     renderLeague();
                     renderStats();
@@ -1027,6 +1110,7 @@
                 const s2 = statsMap[m.team2Id];
                 if (!s1 || !s2) return;
 
+                // Match is played, increment "Main" for both
                 s1.played++; s2.played++;
                 s1.gameWins += m.scoreT1; s1.gameLosses += m.scoreT2;
                 s2.gameWins += m.scoreT2; s2.gameLosses += m.scoreT1;
@@ -1040,6 +1124,7 @@
                     if (m.scoreT2 === 2 && m.scoreT1 === 0) { s2.points += 2; s1.points -= 2; }
                     else if (m.scoreT2 === 2 && m.scoreT1 === 1) { s2.points += 1; s1.points -= 1; }
                 }
+                // If m.winnerId === null (Draw/Cancel), they get 0 points, W/L remains unchanged.
             });
 
             return Object.values(statsMap).sort((a, b) => {
@@ -1050,7 +1135,6 @@
                 return bGameDiff - aGameDiff;
             });
         }
-
 
         // --- UI UTILS & MODALS ---
         function saveDeadline() {
@@ -1425,7 +1509,6 @@
                 function() {
                     let added = 0;
                     backupTeams.forEach(bt => {
-                        // Mencegah data ganda jika tombol diklik 2x
                         if (!state.teams.some(t => t.name === bt.name)) {
                             state.teams.push(bt);
                             added++;
@@ -1641,11 +1724,20 @@
                 `;
             }
 
+            let statusHTML = '<span class="text-slate-500">BO' + match.bestOf + '</span>';
+            if (match.isPlayed) {
+                if (match.winnerId === null && match.scoreT1 === 0 && match.scoreT2 === 0) {
+                    statusHTML = '<span class="text-slate-500 font-bold"><i class="fa-solid fa-ban"></i> Batal/Seri</span>';
+                } else {
+                    statusHTML = '<span class="text-green-400 font-bold"><i class="fa-solid fa-check-double"></i> Selesai</span>';
+                }
+            }
+
             return `
                 <div class="match-card p-3 relative ${match.isPlayed ? 'border-slate-500 bg-slate-800' : 'border-slate-700/60 bg-slate-800/60'}" onclick="openMatchModal('${match.id}')">
                     <div class="text-xs text-slate-400 flex justify-between px-1 mb-2 font-bold">
                         <span>${match.name}</span>
-                        ${match.isPlayed ? '<span class="text-green-400 font-bold"><i class="fa-solid fa-check-double"></i> Selesai</span>' : '<span class="text-slate-500">BO' + match.bestOf + '</span>'}
+                        ${statusHTML}
                     </div>
                     <div class="flex flex-col gap-1.5">
                         <div class="flex justify-between items-center px-3 py-2 rounded text-sm ${isT1Winner ? 'bg-slate-700 font-bold text-white border-l-2 border-brand-magenta shadow-inner' : 'bg-slate-900 text-slate-300'}">
@@ -1736,7 +1828,7 @@
                 let sT1 = 0, sT2 = 0;
                 
                 if (currentSelectedMatch.isPlayed && currentSelectedMatch.games.length === 0) {
-                    // Match has been played but 0 games means it was a WO
+                    // Match has been played but 0 games means it was a WO or Cancelled
                     sT1 = currentSelectedMatch.scoreT1;
                     sT2 = currentSelectedMatch.scoreT2;
                 } else {
@@ -1777,7 +1869,7 @@
                 };
 
                 const showTab = (num) => {
-                    if (currentSelectedMatch.isPlayed && currentSelectedMatch.games.length === 0) return false; // WO scenario, hide tabs
+                    if (currentSelectedMatch.isPlayed && currentSelectedMatch.games.length === 0) return false; // WO/Cancel scenario, hide tabs
                     if (currentSelectedMatch.games.length >= num) return true;
                     if (currentSelectedMatch.games.length === num - 1) { 
                         if (sT1 < targetWins && sT2 < targetWins) return true; 
@@ -1904,7 +1996,6 @@
             const formatMatchesGrouped = (matches) => {
                 const grouped = {};
                 
-                // 1. Kelompokkan jadwal berdasarkan Tanggal & Jam
                 matches.forEach(m => {
                     let timeKey = 'Belum dijadwalkan';
                     let timestamp = 0;
@@ -1930,10 +2021,8 @@
                     grouped[timeKey].items.push(m);
                 });
 
-                // 2. Urutkan grup waktu dari yang paling awal hingga paling akhir
                 const sortedGroupKeys = Object.keys(grouped).sort((a, b) => grouped[a].timeStamp - grouped[b].timeStamp);
 
-                // 3. Susun teksnya
                 let res = '';
                 sortedGroupKeys.forEach(key => {
                     res += `🗓️ *${key}*\n`;
@@ -1944,7 +2033,9 @@
                         const name2 = t2 ? t2.name : 'TBD';
                         
                         if (m.isPlayed) {
-                            if (m.games && m.games.length === 0) {
+                            if (m.winnerId === null && m.scoreT1 === 0 && m.scoreT2 === 0) {
+                                res += `❌ Hasil (Batal/Seri): ${name1} [0] - [0] ${name2}\n`;
+                            } else if (m.games && m.games.length === 0) {
                                 res += `🚩 Hasil (WO): ${name1} [${m.scoreT1}] - [${m.scoreT2}] ${name2}\n`;
                             } else {
                                 res += `✅ Hasil: ${name1} [${m.scoreT1}] - [${m.scoreT2}] ${name2}\n`;
@@ -1953,7 +2044,7 @@
                             res += `⚔️ ${name1} VS ${name2}\n`;
                         }
                     });
-                    res += `\n`; // Spasi antar grup waktu
+                    res += `\n`; 
                 });
                 return res;
             };
@@ -1987,30 +2078,34 @@
             text += `*${match.name}*\n`;
             text += `⚔️ *${t1.name}* vs *${t2.name}*\n`;
             text += `🎯 Skor Akhir: *${match.scoreT1} - ${match.scoreT2}*\n`;
-            text += `🎉 Pemenang: *${winner ? winner.name : 'TBD'}*\n\n`;
+            
+            if (match.winnerId === null && match.scoreT1 === 0 && match.scoreT2 === 0) {
+                text += `❌ *Status: Batal / Tanpa Poin (Kedua tim tidak mendapat poin)*\n\n`;
+            } else {
+                text += `🎉 Pemenang: *${winner ? winner.name : 'TBD'}*\n\n`;
 
-            if (match.games && match.games.length > 0) {
-                text += `*Statistik Game:*\n`;
-                match.games.forEach(g => {
-                    const gameWinner = getTeam(g.winnerId);
-                    let mvpIgn = '-';
-                    let svpIgn = '-';
-                    
-                    // Mencari siapa MVP di tim yang menang, dan SVP di tim yang kalah
-                    g.stats.forEach(s => {
-                        if (s.isMvp) {
-                            if (s.teamId === g.winnerId) mvpIgn = s.ign;
-                            else svpIgn = s.ign;
-                        }
+                if (match.games && match.games.length > 0) {
+                    text += `*Statistik Game:*\n`;
+                    match.games.forEach(g => {
+                        const gameWinner = getTeam(g.winnerId);
+                        let mvpIgn = '-';
+                        let svpIgn = '-';
+                        
+                        g.stats.forEach(s => {
+                            if (s.isMvp) {
+                                if (s.teamId === g.winnerId) mvpIgn = s.ign;
+                                else svpIgn = s.ign;
+                            }
+                        });
+                        
+                        text += `🎮 *Game ${g.gameNumber}:* Menang ${gameWinner ? gameWinner.name : '-'}\n`;
+                        text += `   🥇 MVP: ${mvpIgn}\n`;
+                        text += `   🥈 SVP: ${svpIgn}\n`;
                     });
-                    
-                    text += `🎮 *Game ${g.gameNumber}:* Menang ${gameWinner ? gameWinner.name : '-'}\n`;
-                    text += `   🥇 MVP: ${mvpIgn}\n`;
-                    text += `   🥈 SVP: ${svpIgn}\n`;
-                });
-                text += `\n`;
-            } else if (match.games && match.games.length === 0) {
-                text += `🚩 *(Kemenangan Walkover / WO)*\n\n`;
+                    text += `\n`;
+                } else if (match.games && match.games.length === 0) {
+                    text += `🚩 *(Kemenangan Walkover / WO)*\n\n`;
+                }
             }
 
             text += `🌐 *Cek Detail Klasemen Live:* https://mlbb-aja.vercel.app/`;
@@ -2044,6 +2139,7 @@
                 const mvpRadio = row.querySelector('.mvp-radio');
                 mvpRadio.disabled = true;
                 mvpRadio.checked = false;
+                mvpRadio.dataset.wasChecked = 'false';
             }
         }
 
@@ -2077,7 +2173,7 @@
                         <td class="py-2"><input type="number" min="0" class="stat-input k-input w-12 bg-slate-950 border border-slate-600 rounded text-center text-white p-1" data-ign="${p.ign}" data-team="${team.id}" value="${k}" ${!isPlayed ? 'disabled' : ''}></td>
                         <td class="py-2"><input type="number" min="0" class="stat-input d-input w-12 bg-slate-950 border border-slate-600 rounded text-center text-white p-1" data-ign="${p.ign}" data-team="${team.id}" value="${d}" ${!isPlayed ? 'disabled' : ''}></td>
                         <td class="py-2"><input type="number" min="0" class="stat-input a-input w-12 bg-slate-950 border border-slate-600 rounded text-center text-white p-1" data-ign="${p.ign}" data-team="${team.id}" value="${a}" ${!isPlayed ? 'disabled' : ''}></td>
-                        <td class="py-2"><input type="radio" name="mvp-radio-${teamIndex}" value="${p.ign}" class="mvp-radio cursor-pointer w-4 h-4 text-brand-magenta bg-slate-900 border-slate-600 focus:ring-brand-magenta" ${isMvp ? 'checked' : ''} ${!isPlayed ? 'disabled' : ''}></td>
+                        <td class="py-2"><input type="radio" name="mvp-radio-${teamIndex}" value="${p.ign}" class="mvp-radio cursor-pointer w-4 h-4 text-brand-magenta bg-slate-900 border-slate-600 focus:ring-brand-magenta" ${isMvp ? 'checked data-was-checked="true"' : 'data-was-checked="false"'} ${!isPlayed ? 'disabled' : ''} onclick="if(this.dataset.wasChecked === 'true') { this.checked = false; this.dataset.wasChecked = 'false'; } else { document.getElementsByName(this.name).forEach(el => el.dataset.wasChecked = 'false'); this.dataset.wasChecked = 'true'; }"></td>
                     </tr>
                 `;
             });
@@ -2142,11 +2238,11 @@
 
             if(mvpT1) {
                 const radio = document.querySelector(`input[name="mvp-radio-1"][value="${mvpT1}"]`);
-                if(radio) radio.checked = true;
+                if(radio) { radio.checked = true; radio.dataset.wasChecked = 'true'; }
             }
             if(mvpT2) {
                 const radio = document.querySelector(`input[name="mvp-radio-2"][value="${mvpT2}"]`);
-                if(radio) radio.checked = true;
+                if(radio) { radio.checked = true; radio.dataset.wasChecked = 'true'; }
             }
         }
 
@@ -2162,13 +2258,13 @@
             const mvpRadio1 = document.querySelector('input[name="mvp-radio-1"]:checked');
             const mvpRadio2 = document.querySelector('input[name="mvp-radio-2"]:checked');
 
-            if(!mvpRadio1 || !mvpRadio2) {
-                showToast("Pilih pemain MVP & SVP untuk masing-masing tim!", true);
+            if(!mvpRadio1 && !mvpRadio2) {
+                showToast("Pilih minimal 1 pemain sebagai MVP di game ini!", true);
                 return;
             }
 
-            const mvpIgn1 = mvpRadio1.value;
-            const mvpIgn2 = mvpRadio2.value;
+            const mvpIgn1 = mvpRadio1 ? mvpRadio1.value : null;
+            const mvpIgn2 = mvpRadio2 ? mvpRadio2.value : null;
 
             const stats = [];
             let t1Checked = 0, t2Checked = 0;
@@ -2339,12 +2435,19 @@
                         `;
                     }).join('');
                 } else if (m.games && m.games.length === 0) {
-                    // WO Match
-                    gamesDetailHtml = `
-                        <div class="flex justify-center items-center bg-red-950/30 p-2 rounded mt-2 border border-red-500/30">
-                            <span class="text-xs font-bold text-red-400"><i class="fa-solid fa-flag mr-1"></i> Kemenangan Walkover (WO)</span>
-                        </div>
-                    `;
+                    if (m.winnerId === null && m.scoreT1 === 0 && m.scoreT2 === 0) {
+                        gamesDetailHtml = `
+                            <div class="flex justify-center items-center bg-slate-800 p-2 rounded mt-2 border border-slate-600/50">
+                                <span class="text-xs font-bold text-slate-400"><i class="fa-solid fa-ban mr-1"></i> Batal/Seri (Tanpa Poin)</span>
+                            </div>
+                        `;
+                    } else {
+                        gamesDetailHtml = `
+                            <div class="flex justify-center items-center bg-red-950/30 p-2 rounded mt-2 border border-red-500/30">
+                                <span class="text-xs font-bold text-red-400"><i class="fa-solid fa-flag mr-1"></i> Kemenangan Walkover (WO)</span>
+                            </div>
+                        `;
+                    }
                 }
                 
                 historyContainer.innerHTML += `
@@ -2389,10 +2492,7 @@
             }, 60000);
         };
 
-        // --- CLOUD SYNC (REAL-TIME DATABASE) ---
         function syncState() {
-            // GEMBOK PENGAMAN: Cegah website menyimpan/menimpa data kosong ke server 
-            // jika website belum selesai mendownload data aslinya.
             if (!state.isDataLoaded) {
                 console.warn("Gembok aktif! Menahan sinkronisasi agar data di Firebase tidak tertimpa.");
                 return;
@@ -2410,12 +2510,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // =========================================================================
-        // KONFIGURASI FIREBASE
-        // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDWwx7wO2HBu0IPIBd_-T1VCQQDcly2ct4",
             authDomain: "turnamen-mlbb-aja.firebaseapp.com",
@@ -2425,7 +2522,6 @@
             messagingSenderId: "560846679744",
             appId: "1:560846679744:web:27c93f6456586d3ff28725"
         };
-        // =========================================================================
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
@@ -2470,7 +2566,6 @@
                         if(data.matches) window.state.matches = data.matches;
                         if(data.registrationDeadline !== undefined) window.state.registrationDeadline = data.registrationDeadline;
                         
-                        // BUKA GEMBOK PENGAMAN: Data sudah valid ditarik dari server
                         window.state.isDataLoaded = true;
                         
                         if(window.renderTeams) window.renderTeams();
@@ -2483,7 +2578,6 @@
                             if(window.currentSelectedMatch) window.refreshModalState();
                         }
                     } else {
-                        // Jika database benar-benar masih kosong / baru pertama kali diakses
                         window.state.isDataLoaded = true;
                         setDoc(stateDocRef, {
                             teams: window.state.teams,
