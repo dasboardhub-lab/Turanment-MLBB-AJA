@@ -979,54 +979,70 @@
 
             showCustomConfirm(
                 "Jadwal Ulang Sisa Match?",
-                `Ada <b>${unplayedMatches.length} pertandingan</b> yang belum dimainkan. Sistem akan mengatur ulang jam tandingnya secara otomatis mulai dari waktu yang Anda tentukan, <b>tanpa mengubah atau menghapus</b> pertandingan yang sudah selesai dimainkan. Lanjutkan?`,
+                `Ada <b>${unplayedMatches.length} pertandingan</b> yang belum dimainkan. Sistem akan mengatur ulang jam tandingnya secara cerdas (menghindari bentrok jadwal) mulai dari waktu yang Anda tentukan, <b>tanpa mengubah atau menghapus</b> pertandingan yang sudah selesai dimainkan. Lanjutkan?`,
                 () => {
                     const autoDuration = parseInt(document.getElementById('auto-duration').value) || 60;
                     const autoSlotsPerDay = parseInt(document.getElementById('auto-matches-per-day').value) || 3;
                     const autoConcurrent = parseInt(document.getElementById('auto-concurrent').value) || 1;
 
                     let currentSchedule = new Date(autoStartTimeInput);
-                    let slotsToday = 0; 
                     let dailyStartHours = currentSchedule.getHours();
                     let dailyStartMinutes = currentSchedule.getMinutes();
-                    
-                    let currentSlotMatches = 0; 
-                    let currentSlotTeams = new Set(); 
+                    let slotsToday = 0; 
                     
                     const formatDateString = (dateObj) => {
                         const pad = n => n < 10 ? '0' + n : n;
                         return `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}T${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
                     };
 
-                    unplayedMatches.forEach(match => {
-                        const t1 = match.team1Id;
-                        const t2 = match.team2Id;
+                    // Algoritma Pintar: Masukkan ke "Pool" untuk dicari jadwal yang tidak bentrok
+                    let pool = [...unplayedMatches];
 
-                        const canFitInSlot = (currentSlotMatches < autoConcurrent) && !currentSlotTeams.has(t1) && !currentSlotTeams.has(t2);
+                    while (pool.length > 0) {
+                        let matchesInThisSlot = 0;
+                        let teamsInThisSlot = new Set();
+                        let matchesToPlayNow = [];
 
-                        if (!canFitInSlot) {
-                            slotsToday++;
-                            
-                            if (slotsToday >= autoSlotsPerDay) {
-                                currentSchedule.setDate(currentSchedule.getDate() + 1);
-                                currentSchedule.setHours(dailyStartHours, dailyStartMinutes, 0, 0);
-                                slotsToday = 0; 
-                            } else {
-                                currentSchedule.setMinutes(currentSchedule.getMinutes() + autoDuration);
+                        // Cari dari pool: match mana yang timnya TIDAK SEDANG MAIN di jam/slot ini
+                        for (let i = 0; i < pool.length; i++) {
+                            if (matchesInThisSlot >= autoConcurrent) break;
+
+                            const match = pool[i];
+                            if (!teamsInThisSlot.has(match.team1Id) && !teamsInThisSlot.has(match.team2Id)) {
+                                matchesToPlayNow.push(match);
+                                teamsInThisSlot.add(match.team1Id);
+                                teamsInThisSlot.add(match.team2Id);
+                                matchesInThisSlot++;
                             }
-                            
-                            currentSlotMatches = 0;
-                            currentSlotTeams.clear();
                         }
 
-                        match.scheduledTime = formatDateString(currentSchedule);
-                        currentSlotMatches++;
-                        currentSlotTeams.add(t1);
-                        currentSlotTeams.add(t2);
-                    });
+                        // Proteksi jika sisa tim di pool semuanya terpaksa bentrok (contoh: sisa 1 tim yang harus main berturut-turut)
+                        if (matchesToPlayNow.length === 0) {
+                            matchesToPlayNow.push(pool[0]);
+                        }
+
+                        // Berikan waktu ke match yang terpilih
+                        matchesToPlayNow.forEach(m => {
+                            const originalMatch = state.matches.find(orig => orig.id === m.id);
+                            if (originalMatch) {
+                                originalMatch.scheduledTime = formatDateString(currentSchedule);
+                            }
+                            pool = pool.filter(poolMatch => poolMatch.id !== m.id);
+                        });
+
+                        // Majukan jam tanding ke sesi/jam berikutnya
+                        slotsToday++;
+                        if (slotsToday >= autoSlotsPerDay) {
+                            currentSchedule.setDate(currentSchedule.getDate() + 1);
+                            currentSchedule.setHours(dailyStartHours, dailyStartMinutes, 0, 0);
+                            slotsToday = 0; 
+                        } else {
+                            currentSchedule.setMinutes(currentSchedule.getMinutes() + autoDuration);
+                        }
+                    }
 
                     syncState();
-                    showToast("Sisa pertandingan berhasil dijadwalkan ulang!");
+                    showToast("Sisa pertandingan berhasil dijadwalkan ulang secara optimal!");
                     renderLeague();
                 }
             );
@@ -1679,8 +1695,19 @@
             leagueGrid.innerHTML = '';
             playoffGrid.innerHTML = '';
 
-            const leagueMatches = state.matches.filter(m => m.phase === 'league');
-            const playoffMatches = state.matches.filter(m => m.phase === 'playoff');
+            const sortMatchesFn = (a, b) => {
+                // 1. Tarik yang sudah "Selesai" (isPlayed) ke atas
+                if (a.isPlayed && !b.isPlayed) return -1;
+                if (!a.isPlayed && b.isPlayed) return 1;
+                
+                // 2. Kemudian urutkan berdasarkan waktu/jam tanding
+                const timeA = a.scheduledTime ? new Date(a.scheduledTime).getTime() : Infinity;
+                const timeB = b.scheduledTime ? new Date(b.scheduledTime).getTime() : Infinity;
+                return timeA - timeB;
+            };
+
+            const leagueMatches = state.matches.filter(m => m.phase === 'league').sort(sortMatchesFn);
+            const playoffMatches = state.matches.filter(m => m.phase === 'playoff').sort(sortMatchesFn);
 
             if (playoffMatches.length > 0) {
                 playoffContainer.classList.remove('hidden');
