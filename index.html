@@ -235,7 +235,10 @@
                 </div>
                 <div class="flex gap-3">
                     <div id="admin-tools-container" class="hidden flex gap-2">
-                        <button onclick="promptResetData()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded text-sm font-bold shadow-lg border border-red-500">
+                        <button onclick="restoreExtractedTeams()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold shadow-lg border border-blue-500 transition-colors">
+                            <i class="fa-solid fa-cloud-arrow-down mr-1"></i> Pulihkan 7 Tim
+                        </button>
+                        <button onclick="promptResetData()" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded text-sm font-bold shadow-lg border border-red-500 transition-colors">
                             <i class="fa-solid fa-triangle-exclamation mr-1"></i> Reset Data
                         </button>
                     </div>
@@ -286,7 +289,11 @@
 
                 <div class="flex gap-3 mt-2 flex-wrap">
                     <button onclick="generateLeagueSchedule()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all border border-blue-500 flex items-center gap-2">
-                        <i class="fa-solid fa-calendar-plus"></i> Buat Jadwal Liga (Rotasi Merata)
+                        <i class="fa-solid fa-calendar-plus"></i> Buat Jadwal Liga (Otomatis)
+                    </button>
+                    <!-- TOMBOL SAKTI UNTUK WA DRAFT SCHEDULE -->
+                    <button onclick="applySpecificSchedule()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500 flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Pasang Jadwal Draft WA (18-20 Ags)
                     </button>
                     <button onclick="generatePlayoffs()" class="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(147,51,234,0.4)] transition-all border border-purple-500 flex items-center gap-2">
                         <i class="fa-solid fa-trophy"></i> Buat Playoff (Top 4)
@@ -614,6 +621,7 @@
 
     <script>
         var state = {
+            isDataLoaded: false, // GEMBOK KEAMANAN UTAMA
             isAdmin: false,
             registrationDeadline: null,
             teams: [],
@@ -882,6 +890,84 @@
             syncState();
             showToast("Jadwal Playoff (Top 4) berhasil dibuat!");
             renderLeague();
+        }
+
+        // --- APPLY MANUAL SCHEDULE DARI WHATSAPP ---
+        function applySpecificSchedule() {
+            if (!state.isAdmin) return;
+            
+            showCustomConfirm(
+                "Pasang Jadwal Draft WA?",
+                "Ini akan <b>menghapus jadwal liga saat ini</b> dan menggantinya persis sesuai dengan draft teks WhatsApp (Tgl 18 - 20 Agustus). Lanjutkan?",
+                () => {
+                    // Bersihkan jadwal liga yang ada
+                    state.matches = state.matches.filter(m => m.phase !== 'league');
+                    
+                    // Kamus Tim sesuai ID dari Backup (Hati-hati, pastikan tim ini yang dipakai)
+                    // team-wws, team-abg, team-bgd, team-mnd, team-dgk, team-tma, team-atr
+                    const draft = [
+                        // 18 Ags 19:00
+                        { t1: 'team-atr', t2: 'team-bgd', time: '2026-08-18T19:00' },
+                        { t1: 'team-tma', t2: 'team-mnd', time: '2026-08-18T19:00' },
+                        { t1: 'team-dgk', t2: 'team-abg', time: '2026-08-18T19:00' },
+                        // 18 Ags 20:00
+                        { t1: 'team-wws', t2: 'team-bgd', time: '2026-08-18T20:00' },
+                        { t1: 'team-atr', t2: 'team-abg', time: '2026-08-18T20:00' },
+                        { t1: 'team-tma', t2: 'team-dgk', time: '2026-08-18T20:00' },
+                        // 18 Ags 21:00
+                        { t1: 'team-wws', t2: 'team-mnd', time: '2026-08-18T21:00' },
+                        { t1: 'team-bgd', t2: 'team-abg', time: '2026-08-18T21:00' },
+                        { t1: 'team-atr', t2: 'team-tma', time: '2026-08-18T21:00' },
+                        // 19 Ags 19:00
+                        { t1: 'team-wws', t2: 'team-abg', time: '2026-08-19T19:00' },
+                        { t1: 'team-mnd', t2: 'team-dgk', time: '2026-08-19T19:00' },
+                        { t1: 'team-bgd', t2: 'team-tma', time: '2026-08-19T19:00' },
+                        // 19 Ags 20:00
+                        { t1: 'team-wws', t2: 'team-dgk', time: '2026-08-19T20:00' },
+                        { t1: 'team-abg', t2: 'team-tma', time: '2026-08-19T20:00' },
+                        { t1: 'team-mnd', t2: 'team-atr', time: '2026-08-19T20:00' },
+                        // 19 Ags 21:00
+                        { t1: 'team-wws', t2: 'team-tma', time: '2026-08-19T21:00' },
+                        { t1: 'team-dgk', t2: 'team-atr', time: '2026-08-19T21:00' },
+                        { t1: 'team-mnd', t2: 'team-bgd', time: '2026-08-19T21:00' },
+                        // 20 Ags 19:00
+                        { t1: 'team-wws', t2: 'team-atr', time: '2026-08-20T19:00' },
+                        { t1: 'team-dgk', t2: 'team-bgd', time: '2026-08-20T19:00' },
+                        { t1: 'team-abg', t2: 'team-mnd', time: '2026-08-20T19:00' }
+                    ];
+
+                    let mId = Date.now();
+                    let matchCounter = 1;
+
+                    draft.forEach(d => {
+                        const team1 = state.teams.find(t => t.id === d.t1);
+                        const team2 = state.teams.find(t => t.id === d.t2);
+                        
+                        if (team1 && team2) {
+                            state.matches.push({
+                                id: 'L' + mId++,
+                                phase: 'league',
+                                name: `Liga - Match ${matchCounter++}`,
+                                team1Id: d.t1,
+                                team2Id: d.t2,
+                                winnerId: null,
+                                scoreT1: 0,
+                                scoreT2: 0,
+                                games: [],
+                                isPlayed: false,
+                                scheduledTime: d.time,
+                                bestOf: 3 
+                            });
+                        } else {
+                            console.warn("Tim tidak ditemukan, pastikan 7 tim utama sudah dipulihkan.");
+                        }
+                    });
+
+                    syncState();
+                    showToast("Jadwal persis sesuai Draft WA berhasil diterapkan!");
+                    renderLeague();
+                }
+            );
         }
 
         // --- WALKOVER LOGIC ---
@@ -1253,6 +1339,111 @@
         }
 
         // --- TEAM DELETE & RESET ---
+        function restoreExtractedTeams() {
+            if (!state.isAdmin) return;
+
+            const backupTeams = [
+                {
+                    id: 'team-wws', name: 'wrong way sheep', waKapten: '',
+                    players: [
+                        { ign: 'WIE™ putri nabila', name: 'Yuditya', mlbbId: '42193285', hub: 'LOSLO', nik: '10077096', role: 'Roamer', isSub: false },
+                        { ign: 'M|£a*', name: 'Moh Zidan HL', mlbbId: '168062368', hub: 'LOSLO', nik: '10068251', role: 'Gold Laner', isSub: false },
+                        { ign: 'azzahra', name: 'Ardiansyah fan saputra', mlbbId: '1970478811', hub: 'LOSLO', nik: '10083750', role: 'Midlaner', isSub: false },
+                        { ign: 'GILE LU NDROO', name: 'Randy aditya', mlbbId: '288953942', hub: 'LOSLO', nik: '10073647', role: 'EXP Laner', isSub: false },
+                        { ign: 'Danzy', name: 'Mohammad Wildan alamri', mlbbId: '1510002524', hub: 'LOSLO', nik: '10086758', role: 'Jungler', isSub: false }
+                    ]
+                },
+                {
+                    id: 'team-abg', name: 'Abangkuuuuu', waKapten: '',
+                    players: [
+                        { ign: 'T@ufiq', name: 'TAUFIQ NUR AMANAH', mlbbId: '172687686', hub: 'DAYAO', nik: '10069463', role: 'Roamer', isSub: false },
+                        { ign: 'III 19°', name: 'RIZKI SYAWAL', mlbbId: '802728893 (12197)', hub: 'DAYAO', nik: '10086269', role: 'Flex/All Role', isSub: false },
+                        { ign: 'PapaPulangMamaBasah', name: 'ABD HALIK', mlbbId: '19609024 (2022)', hub: 'DAYAO', nik: '10084707', role: 'Midlaner', isSub: false },
+                        { ign: 'yousuf*4893', name: 'ERIZA MAULANA SAPUTRA', mlbbId: '1106569594 (13440)', hub: 'DAYAO', nik: '10085421', role: 'Jungler', isSub: false },
+                        { ign: 'Mazholank 46', name: 'MAUHAMMAD HASBI B', mlbbId: '1465406465', hub: 'DAYAO', nik: '10085336', role: 'Flex/All Role', isSub: false }
+                    ]
+                },
+                {
+                    id: 'team-bgd', name: 'BEGADANG 45', waKapten: '',
+                    players: [
+                        { ign: 'J26', name: 'JAMAL', mlbbId: '443230294', hub: 'MKS', nik: '10049575', role: 'Midlaner', isSub: false },
+                        { ign: 'Fhrl', name: 'FAHRUL', mlbbId: '385501037', hub: 'MKS', nik: '10081241', role: 'Flex/All Role', isSub: false },
+                        { ign: 'Gosc•Xero', name: 'Ghani', mlbbId: '12792107', hub: 'MKS', nik: '10077579', role: 'Roamer', isSub: false },
+                        { ign: "JOE'S", name: 'Muh Yustifar Lantjong', mlbbId: '75895943', hub: 'MKS', nik: '10011682', role: 'Flex/All Role', isSub: false },
+                        { ign: 'sarkodes', name: 'Rafli azis', mlbbId: '264525466 (2260)', hub: 'MKS', nik: '10076438', role: 'Flex/All Role', isSub: false },
+                        { ign: 'USER GG', name: 'GUSTIADI', mlbbId: '73418121', hub: 'MKS', nik: '10001596', role: 'Flex/All Role', isSub: true }
+                    ]
+                },
+                {
+                    id: 'team-mnd', name: 'ManadoAja', waKapten: '',
+                    players: [
+                        { ign: 'P O P', name: 'Rizki', mlbbId: '35668276', hub: 'HUB MND', nik: '', role: 'EXP Laner', isSub: false },
+                        { ign: 'Liquid death', name: 'Christian', mlbbId: '104522853', hub: 'SS MND', nik: '10083981', role: 'Gold Laner', isSub: false },
+                        { ign: 'Aslannn', name: 'Maulana', mlbbId: '308178209', hub: 'SS MND', nik: '10083121', role: 'Jungler', isSub: false },
+                        { ign: 'Aan', name: 'Aan', mlbbId: '2170018858', hub: 'HUB MND', nik: '', role: 'Roamer', isSub: false },
+                        { ign: '300K Full Servis', name: 'Jhon', mlbbId: '1542145882', hub: 'SS MND', nik: '', role: 'Roamer', isSub: false },
+                        { ign: 'Escanor', name: 'Nando', mlbbId: '141387746', hub: 'SS MND', nik: '', role: 'Flex/All Role', isSub: true }
+                    ]
+                },
+                {
+                    id: 'team-dgk', name: 'DG Koro', waKapten: '',
+                    players: [
+                        { ign: '™JonthoR™', name: 'AQBAR B', mlbbId: '114541580', hub: 'DAYAO', nik: '10022348', role: 'Midlaner', isSub: false },
+                        { ign: 'zayyanazka', name: 'MUH. ASRIANTO', mlbbId: '2174338197 (16453)', hub: 'DAYAO', nik: '10079090', role: 'Midlaner', isSub: false },
+                        { ign: 'Jin*{warpang}', name: 'Muhammad Taqwin', mlbbId: '138512300', hub: 'DAYAO', nik: '10084885', role: 'Flex/All Role', isSub: false },
+                        { ign: 'Stulky', name: 'Andi miswar', mlbbId: '509273862', hub: 'DAYAO', nik: '10084938', role: 'Flex/All Role', isSub: false },
+                        { ign: 'Arkarsy2930.', name: 'Khairuddin', mlbbId: '53399570.', hub: 'ADAYAO', nik: '10086897', role: 'Roamer', isSub: false },
+                        { ign: 'yousuf*4893', name: 'Eriza maulana', mlbbId: '1106569594 (13440)', hub: 'DAYAO', nik: '10085421', role: 'Flex/All Role', isSub: true }
+                    ]
+                },
+                {
+                    id: 'team-tma', name: 'TOMA', waKapten: '',
+                    players: [
+                        { ign: 'ZAFY', name: 'A Fauzan HI Abdullah', mlbbId: '1259506953(15111)', hub: 'SOATO', nik: '10068772', role: 'Flex/All Role', isSub: false },
+                        { ign: 'GALANG ARSHY 10', name: 'Arsi ismail', mlbbId: '1567060077 (16576)', hub: 'SOATO', nik: '10075030', role: 'Midlaner', isSub: false },
+                        { ign: 'PUNISHER', name: 'Fahrun', mlbbId: '128537764 (2638)', hub: 'SS SOATO', nik: '10083810', role: 'Roamer', isSub: false },
+                        { ign: 'Mr. brendikk', name: 'Sendy Supardjo', mlbbId: '1169080104 (13733)', hub: 'SOATO', nik: '10072716', role: 'Gold Laner', isSub: false },
+                        { ign: "ilman'a", name: 'Muhamad fahmi ilman', mlbbId: '81823876 (2158)', hub: 'SOATO', nik: '10064219', role: 'Flex/All Role', isSub: false }
+                    ]
+                },
+                {
+                    id: 'team-atr', name: 'ATTITUDE REPORT', waKapten: '',
+                    players: [
+                        { ign: 'Yufebz', name: 'Yudha Febriansyah', mlbbId: '11068658', hub: 'LH 25 MKS', nik: '10014210', role: 'Flex/All Role', isSub: false },
+                        { ign: 'AII?', name: 'Andi al isla', mlbbId: '4634724', hub: 'SS PRPOO', nik: '10069641', role: 'Jungler', isSub: false },
+                        { ign: 'T A K E R U', name: 'Kurniandar', mlbbId: '16870021', hub: 'SS PRPOO', nik: '10081611', role: 'Roamer', isSub: false },
+                        { ign: 'Riska Cahyani', name: 'Ruslan', mlbbId: '168670021', hub: 'SS PRPOO', nik: '10077566', role: 'EXP Laner', isSub: false },
+                        { ign: 'Hypersonic F1', name: 'Nasrullah', mlbbId: '133199704', hub: 'Hub MKS', nik: '10076544', role: 'Flex/All Role', isSub: false },
+                        { ign: 'Qhuduz', name: 'Laode', mlbbId: '149863520', hub: 'SS PRPOO', nik: '10014207', role: 'Flex/All Role', isSub: true }
+                    ]
+                }
+            ];
+
+            showCustomConfirm(
+                "Pulihkan 7 Tim ke Database?",
+                "Sistem akan otomatis menginput seluruh anggota dari 7 tim: wrong way sheep, Abangkuuuuu, BEGADANG 45, ManadoAja, DG Koro, TOMA, ATTITUDE REPORT. Lanjutkan?",
+                function() {
+                    let added = 0;
+                    backupTeams.forEach(bt => {
+                        // Mencegah data ganda jika tombol diklik 2x
+                        if (!state.teams.some(t => t.name === bt.name)) {
+                            state.teams.push(bt);
+                            added++;
+                        }
+                    });
+                    
+                    if (added > 0) {
+                        syncState();
+                        updateQuotaUI();
+                        renderTeams();
+                        showToast(`${added} Tim berhasil dipulihkan secara instan!`);
+                    } else {
+                        showToast("Tim sudah ada di dalam database.");
+                    }
+                }
+            );
+        }
+
         function promptResetData() {
             if (!state.isAdmin) return;
             showCustomConfirm(
@@ -2200,6 +2391,13 @@
 
         // --- CLOUD SYNC (REAL-TIME DATABASE) ---
         function syncState() {
+            // GEMBOK PENGAMAN: Cegah website menyimpan/menimpa data kosong ke server 
+            // jika website belum selesai mendownload data aslinya.
+            if (!state.isDataLoaded) {
+                console.warn("Gembok aktif! Menahan sinkronisasi agar data di Firebase tidak tertimpa.");
+                return;
+            }
+
             if (window.saveStateToCloud) {
                 window.saveStateToCloud({
                     teams: state.teams,
@@ -2216,7 +2414,7 @@
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // =========================================================================
-        // KONFIGURASI FIREBASE (Custom)
+        // KONFIGURASI FIREBASE
         // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDWwx7wO2HBu0IPIBd_-T1VCQQDcly2ct4",
@@ -2234,7 +2432,6 @@
         const auth = getAuth(app);
         let currentUser = null;
         
-        // Path penyimpanan data custom di koleksi 'turnamen_mlbb'
         const stateDocRef = doc(db, 'turnamen_mlbb', 'globalState');
 
         window.saveStateToCloud = async function(newState) {
@@ -2273,6 +2470,9 @@
                         if(data.matches) window.state.matches = data.matches;
                         if(data.registrationDeadline !== undefined) window.state.registrationDeadline = data.registrationDeadline;
                         
+                        // BUKA GEMBOK PENGAMAN: Data sudah valid ditarik dari server
+                        window.state.isDataLoaded = true;
+                        
                         if(window.renderTeams) window.renderTeams();
                         if(window.renderLeague) window.renderLeague();
                         if(window.renderStats) window.renderStats();
@@ -2283,6 +2483,8 @@
                             if(window.currentSelectedMatch) window.refreshModalState();
                         }
                     } else {
+                        // Jika database benar-benar masih kosong / baru pertama kali diakses
+                        window.state.isDataLoaded = true;
                         setDoc(stateDocRef, {
                             teams: window.state.teams,
                             matches: window.state.matches,
