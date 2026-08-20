@@ -89,6 +89,7 @@
                     </div>
                     <span class="font-black text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-300">MLBB AJA <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-magenta to-purple-500">CUP</span></span>
                 </div>
+                
                 <div class="hidden md:flex items-center space-x-4">
                     <button onclick="showView('home')" class="nav-item active px-3 py-2 text-sm font-medium transition-colors hover:text-brand-magenta" id="nav-home">Beranda</button>
                     <button onclick="showView('register')" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-brand-magenta text-slate-300" id="nav-register">Daftar Tim</button>
@@ -96,7 +97,6 @@
                     <button onclick="showView('bracket')" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-brand-magenta text-slate-300" id="nav-bracket">Klasemen & Jadwal</button>
                     <button onclick="showView('stats')" class="nav-item px-3 py-2 text-sm font-medium transition-colors hover:text-brand-magenta text-slate-300" id="nav-stats">Statistik & MVP</button>
                     
-                    <!-- Admin Auth Indicator -->
                     <div id="auth-nav-container" class="ml-4 pl-4 border-l border-slate-700 flex items-center gap-3">
                         <button onclick="openLoginModal()" id="btn-login-trigger" class="bg-slate-800 hover:bg-slate-700 border border-slate-600 text-xs px-3 py-2 rounded font-bold text-slate-200 flex items-center gap-2">
                             <i class="fa-solid fa-lock text-brand-magenta"></i> Login Panitia
@@ -112,7 +112,7 @@
                         <div id="cloud-sync-indicator" class="w-3 h-3 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" title="Status Cloud Database (Merah: Offline, Hijau: Tersambung)"></div>
                     </div>
                 </div>
-                <!-- Mobile menu button -->
+                
                 <div class="md:hidden flex items-center gap-3">
                     <button onclick="openLoginModal()" id="mobile-login-btn" class="text-xs bg-slate-800 text-slate-200 border border-slate-600 px-2.5 py-1.5 rounded">
                         <i class="fa-solid fa-lock text-brand-magenta"></i> Login
@@ -124,7 +124,7 @@
                 </div>
             </div>
         </div>
-        <!-- Mobile Menu -->
+        
         <div id="mobile-menu" class="hidden md:hidden bg-brand-card border-b border-slate-700">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
                 <button onclick="showView('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-white hover:bg-slate-700">Beranda</button>
@@ -138,7 +138,6 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-[calc(100vh-64px)] relative">
         
-        <!-- ================= VIEW: HOME ================= -->
         <div id="view-home" class="view-section animate-fade-in block">
             <div class="text-center py-20 px-4">
                 <div class="inline-block px-4 py-1 rounded-full bg-slate-800 border border-brand-magenta text-brand-magenta font-semibold mb-4 text-sm">
@@ -164,7 +163,6 @@
             </div>
         </div>
 
-        <!-- ================= VIEW: REGISTER ================= -->
         <div id="view-register" class="view-section hidden">
             <div class="max-w-4xl mx-auto glass-panel p-8 rounded-2xl">
                 <div class="flex justify-between items-center border-b border-slate-700 pb-4 mb-6">
@@ -175,7 +173,6 @@
                 </div>
                 <p class="text-slate-400 mb-8 text-sm">Satu tim terdiri dari 5 pemain inti dan maksimal 2 pemain cadangan. Harap isi data NIK dan Kode HUB dengan benar.</p>
                 
-                <!-- Admin Control: Set Deadline -->
                 <div id="admin-deadline-control" class="hidden mb-6 bg-slate-900 border border-brand-accent p-4 rounded-lg shadow-lg">
                     <h4 class="text-brand-accent font-bold mb-3"><i class="fa-solid fa-user-shield mr-2"></i>Pengaturan Panitia: Waktu Pendaftaran</h4>
                     <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-end">
@@ -190,12 +187,10 @@
                     </div>
                 </div>
 
-                <!-- Status Banner -->
                 <div id="registration-status-banner" class="hidden"></div>
 
                 <form id="registration-form" onsubmit="handleRegistration(event)">
                     <fieldset id="form-inputs-group">
-                        <!-- Informasi Tim -->
                         <div class="mb-6 bg-slate-800 p-5 rounded-lg border border-slate-700">
                             <h3 class="text-xl font-semibold mb-4 text-white"><i class="fa-solid fa-shield-halved mr-2 text-brand-magenta"></i>Informasi Tim</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -210,11 +205,10 @@
                             </div>
                         </div>
 
-                        <!-- Roster Pemain -->
                         <div class="mb-8">
                             <h3 class="text-xl font-semibold mb-4 text-white"><i class="fa-solid fa-users mr-2 text-brand-magenta"></i>Roster Pemain</h3>
                             <div id="players-container" class="space-y-4">
-                                <!-- Pemain digenerate via JS -->
+                                <!-- Generated via JS -->
                             </div>
                         </div>
                     </fieldset>
@@ -226,7 +220,6 @@
             </div>
         </div>
 
-        <!-- ================= VIEW: TEAMS ================= -->
         <div id="view-teams" class="view-section hidden">
             <div class="flex justify-between items-end mb-8 border-b border-slate-700 pb-4">
                 <div>
@@ -249,11 +242,10 @@
             </div>
 
             <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Card tim digenerate via JS -->
+                <!-- Generated via JS -->
             </div>
         </div>
 
-        <!-- ================= VIEW: LEAGUE & SCHEDULE ================= -->
         <div id="view-bracket" class="view-section hidden">
             <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-4 flex-wrap gap-4">
                 <div>
@@ -262,7 +254,6 @@
                 </div>
             </div>
 
-            <!-- Admin Controls for Scheduling -->
             <div id="league-admin-controls" class="hidden flex-col gap-4 mb-8 bg-slate-900 p-5 rounded-lg border border-slate-700 shadow-lg">
                 <h4 class="text-brand-accent font-bold text-lg border-b border-slate-700 pb-2"><i class="fa-solid fa-cogs mr-2"></i>Pengaturan Jadwal & Otomatisasi (Area Panitia)</h4>
                 
@@ -291,7 +282,6 @@
                     <button onclick="generateLeagueSchedule()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all border border-blue-500 flex items-center gap-2">
                         <i class="fa-solid fa-calendar-plus"></i> Buat Jadwal Liga (Otomatis)
                     </button>
-                    <!-- TOMBOL SAKTI UNTUK WA DRAFT SCHEDULE -->
                     <button onclick="applySpecificSchedule()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded text-sm font-bold shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all border border-emerald-500 flex items-center gap-2">
                         <i class="fa-brands fa-whatsapp text-lg"></i> Pasang Jadwal Draft WA (18-20 Ags)
                     </button>
@@ -304,7 +294,6 @@
                 </div>
             </div>
 
-            <!-- Tabel Klasemen -->
             <div class="glass-panel p-6 rounded-2xl relative shadow-[inset_0_0_20px_rgba(0,0,0,0.5)] mb-8">
                 <h3 class="font-bold text-xl mb-4 text-white"><i class="fa-solid fa-ranking-star text-brand-magenta mr-2"></i> Papan Klasemen Liga</h3>
                 <div class="overflow-x-auto">
@@ -331,14 +320,17 @@
                 </div>
             </div>
 
-            <!-- Daftar Pertandingan -->
             <div>
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-3">
                     <h3 class="font-bold text-xl text-white"><i class="fa-solid fa-calendar-days text-brand-magenta mr-2"></i> Jadwal & Hasil Pertandingan</h3>
-                    <!-- Tombol Salin Jadwal ke WA -->
-                    <button onclick="shareAllScheduleWA()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2.5 rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-transform hover:scale-105 flex items-center gap-2">
-                        <i class="fa-brands fa-whatsapp text-lg"></i> Salin Jadwal ke WA
-                    </button>
+                    <div class="flex gap-2 flex-wrap">
+                        <button onclick="shareAllScheduleWA(true)" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2.5 rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(34,197,94,0.4)] transition-transform hover:scale-105 flex items-center gap-2">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Salin Semua (Selesai & Sisa)
+                        </button>
+                        <button onclick="shareAllScheduleWA(false)" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2.5 rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-transform hover:scale-105 flex items-center gap-2">
+                            <i class="fa-regular fa-clock text-lg"></i> Salin Sisa Jadwal Saja
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Playoff Section -->
@@ -357,7 +349,6 @@
             </div>
         </div>
 
-        <!-- ================= VIEW: STATS ================= -->
         <div id="view-stats" class="view-section hidden">
             <div class="mb-8">
                 <h2 class="text-3xl font-bold">Statistik & Top Players</h2>
@@ -365,7 +356,6 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Leaderboard KDA -->
                 <div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden border border-slate-700">
                     <div class="bg-slate-800 px-6 py-4 border-b border-slate-700 flex justify-between items-center">
                         <h3 class="font-bold text-lg"><i class="fa-solid fa-crown text-brand-magenta mr-2"></i> Papan Peringkat Pemain</h3>
@@ -391,7 +381,6 @@
                     </div>
                 </div>
 
-                <!-- Riwayat Pertandingan Terakhir -->
                 <div class="glass-panel rounded-2xl border border-slate-700">
                     <div class="bg-slate-800 px-6 py-4 border-b border-slate-700">
                         <h3 class="font-bold text-lg"><i class="fa-solid fa-clock-rotate-left text-brand-magenta mr-2"></i> Log Pertandingan</h3>
@@ -405,7 +394,6 @@
 
     </main>
 
-    <!-- ================= MODAL: SUCCESS REGISTER ================= -->
     <div id="success-register-modal" class="fixed inset-0 bg-black/80 z-[250] hidden flex justify-center items-center backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-brand-card border-2 border-green-500 rounded-xl w-full max-w-md shadow-[0_0_30px_rgba(34,197,94,0.3)] relative transform scale-95 transition-transform duration-300 text-center p-8" id="success-register-box">
             <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-green-500">
@@ -426,7 +414,6 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: LOGIN PANITIA ================= -->
     <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[150] hidden flex justify-center items-center backdrop-blur-sm p-4">
         <div class="bg-brand-card border border-brand-magenta rounded-xl w-full max-w-md shadow-2xl p-6 relative">
             <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
@@ -451,18 +438,21 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: INPUT PERTANDINGAN ================= -->
     <div id="match-modal" class="fixed inset-0 bg-black bg-opacity-80 z-[100] hidden flex justify-center items-center backdrop-blur-sm p-4 sm:p-6">
         <div class="bg-brand-card border border-brand-magenta rounded-xl w-full max-w-5xl shadow-2xl relative flex flex-col max-h-[95vh] sm:max-h-[90vh]">
-            <!-- Header Fixed -->
+            <!-- Header Fixed with Reset Button -->
             <div class="px-6 py-4 border-b border-slate-600 flex justify-between items-center bg-slate-800 rounded-t-xl flex-shrink-0">
                 <h3 class="text-xl font-bold text-white" id="modal-match-title"><i class="fa-solid fa-gamepad mr-2 text-brand-magenta"></i> Kelola Pertandingan</h3>
-                <button onclick="closeMatchModal()" class="text-slate-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-2xl"></i>
-                </button>
+                <div class="flex items-center gap-3">
+                    <button onclick="promptResetMatch()" id="btn-reset-match" class="hidden text-xs bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded shadow-lg transition-colors border border-red-500 flex items-center gap-1.5 font-bold">
+                        <i class="fa-solid fa-rotate-left"></i> Edit / Reset Hasil
+                    </button>
+                    <button onclick="closeMatchModal()" class="text-slate-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-xmark text-2xl"></i>
+                    </button>
+                </div>
             </div>
             
-            <!-- Body Scrollable -->
             <div class="p-6 overflow-y-auto">
                 <!-- Section 1: Pengaturan Tim & Jadwal -->
                 <div class="mb-8 bg-slate-900 p-5 rounded-lg border border-slate-700">
@@ -601,7 +591,6 @@
         </div>
     </div>
 
-    <!-- ================= MODAL: CUSTOM CONFIRM ================= -->
     <div id="custom-confirm-modal" class="fixed inset-0 bg-black/80 z-[200] hidden flex justify-center items-center backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
         <div class="bg-brand-card border border-brand-magenta rounded-xl w-full max-w-md shadow-2xl relative transform scale-95 transition-transform duration-300" id="custom-confirm-box">
             <div class="px-6 py-4 border-b border-slate-700">
@@ -649,7 +638,7 @@
             updateAdminAuthUI();
         }
 
-        // --- ADMIN AUTH SYSTEM ---
+        // --- STREAMING_CHUNK:Setting up Admin Auth Control ---
         function openLoginModal() {
             document.getElementById('login-modal').classList.remove('hidden');
         }
@@ -718,7 +707,7 @@
             }
         }
 
-        // --- NEW LEAGUE SYSTEM (GENERATORS DENGAN ROTASI BUNDAR & PARALEL MATCH) ---
+        // --- STREAMING_CHUNK:Implementing Smart Scheduling Logic ---
         function generateLeagueSchedule() {
             if (!state.isAdmin) return;
             if (state.teams.length < 2) {
@@ -739,19 +728,16 @@
         }
 
         function doGenerateLeague() {
-            // Remove old league matches
             state.matches = state.matches.filter(m => m.phase !== 'league');
             
             let mId = Date.now();
             let matchCounter = 1;
 
-            // Form Inputs for Automation
             const autoStartTimeInput = document.getElementById('auto-start-time').value;
             const autoDuration = parseInt(document.getElementById('auto-duration').value) || 60;
             const autoSlotsPerDay = parseInt(document.getElementById('auto-matches-per-day').value) || 3;
             const autoConcurrent = parseInt(document.getElementById('auto-concurrent').value) || 1;
             
-            // --- Algoritma Round-Robin (Circle Method) ---
             let roundTeams = [...state.teams];
             if (roundTeams.length % 2 !== 0) {
                 roundTeams.push({ id: null, name: 'BYE' });
@@ -789,7 +775,6 @@
                 roundTeams.splice(1, 0, lastTeam); 
             }
 
-            // --- Penjadwalan Waktu (Termasuk Paralel Match) ---
             if (autoStartTimeInput && generatedMatches.length > 0) {
                 let currentSchedule = new Date(autoStartTimeInput);
                 let slotsToday = 0; 
@@ -838,57 +823,7 @@
             renderLeague();
         }
 
-        function generatePlayoffs() {
-            if (!state.isAdmin) return;
-            
-            const standings = calculateStandings();
-            if (standings.length < 4) {
-                showToast("Minimal butuh 4 tim yang aktif untuk Playoff!", true);
-                return;
-            }
-
-            const hasPlayoffMatches = state.matches.some(m => m.phase === 'playoff');
-            if (hasPlayoffMatches) {
-                showCustomConfirm(
-                    "Buat Ulang Playoff?",
-                    "Jadwal Playoff sudah ada. Membuat ulang akan <b>menghapus hasil playoff sebelumnya</b> dan mengambil ulang Top 4 dari klasemen saat ini. Lanjutkan?",
-                    () => { doGeneratePlayoffs(standings); }
-                );
-            } else {
-                doGeneratePlayoffs(standings);
-            }
-        }
-
-        function doGeneratePlayoffs(standings) {
-            state.matches = state.matches.filter(m => m.phase !== 'playoff');
-            let mId = Date.now();
-
-            const top4 = standings.slice(0, 4);
-
-            state.matches.push({
-                id: 'P' + mId++, phase: 'playoff', name: `Semi Final 1`,
-                team1Id: top4[0].id, team2Id: top4[3].id, winnerId: null,
-                scoreT1: 0, scoreT2: 0, games: [], isPlayed: false, scheduledTime: null, bestOf: 3
-            });
-
-            state.matches.push({
-                id: 'P' + mId++, phase: 'playoff', name: `Semi Final 2`,
-                team1Id: top4[1].id, team2Id: top4[2].id, winnerId: null,
-                scoreT1: 0, scoreT2: 0, games: [], isPlayed: false, scheduledTime: null, bestOf: 3
-            });
-
-            state.matches.push({
-                id: 'P' + mId++, phase: 'playoff', name: `Grand Final`,
-                team1Id: null, team2Id: null, winnerId: null,
-                scoreT1: 0, scoreT2: 0, games: [], isPlayed: false, scheduledTime: null, bestOf: 5
-            });
-
-            syncState();
-            showToast("Jadwal Playoff (Top 4) berhasil dibuat!");
-            renderLeague();
-        }
-
-        // --- APPLY MANUAL SCHEDULE DARI WHATSAPP ---
+        // --- STREAMING_CHUNK:Implementing Custom WhatsApp Draft Scheduling ---
         function applySpecificSchedule() {
             if (!state.isAdmin) return;
             
@@ -963,6 +898,7 @@
             );
         }
 
+        // --- STREAMING_CHUNK:Implementing Smart Match Rescheduling ---
         function rescheduleUnplayedMatches() {
             if (!state.isAdmin) return;
             const autoStartTimeInput = document.getElementById('auto-start-time').value;
@@ -995,7 +931,6 @@
                         return `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())}T${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}`;
                     };
 
-                    // Algoritma Pintar: Masukkan ke "Pool" untuk dicari jadwal yang tidak bentrok
                     let pool = [...unplayedMatches];
 
                     while (pool.length > 0) {
@@ -1003,7 +938,6 @@
                         let teamsInThisSlot = new Set();
                         let matchesToPlayNow = [];
 
-                        // Cari dari pool: match mana yang timnya TIDAK SEDANG MAIN di jam/slot ini
                         for (let i = 0; i < pool.length; i++) {
                             if (matchesInThisSlot >= autoConcurrent) break;
 
@@ -1016,12 +950,10 @@
                             }
                         }
 
-                        // Proteksi jika sisa tim di pool semuanya terpaksa bentrok (contoh: sisa 1 tim yang harus main berturut-turut)
                         if (matchesToPlayNow.length === 0) {
                             matchesToPlayNow.push(pool[0]);
                         }
 
-                        // Berikan waktu ke match yang terpilih
                         matchesToPlayNow.forEach(m => {
                             const originalMatch = state.matches.find(orig => orig.id === m.id);
                             if (originalMatch) {
@@ -1030,7 +962,6 @@
                             pool = pool.filter(poolMatch => poolMatch.id !== m.id);
                         });
 
-                        // Majukan jam tanding ke sesi/jam berikutnya
                         slotsToday++;
                         if (slotsToday >= autoSlotsPerDay) {
                             currentSchedule.setDate(currentSchedule.getDate() + 1);
@@ -1048,7 +979,58 @@
             );
         }
 
-        // --- WALKOVER & CANCEL LOGIC ---
+        // --- STREAMING_CHUNK:Implementing Playoffs Generation ---
+        function generatePlayoffs() {
+            if (!state.isAdmin) return;
+            
+            const standings = calculateStandings();
+            if (standings.length < 4) {
+                showToast("Minimal butuh 4 tim yang aktif untuk Playoff!", true);
+                return;
+            }
+
+            const hasPlayoffMatches = state.matches.some(m => m.phase === 'playoff');
+            if (hasPlayoffMatches) {
+                showCustomConfirm(
+                    "Buat Ulang Playoff?",
+                    "Jadwal Playoff sudah ada. Membuat ulang akan <b>menghapus hasil playoff sebelumnya</b> dan mengambil ulang Top 4 dari klasemen saat ini. Lanjutkan?",
+                    () => { doGeneratePlayoffs(standings); }
+                );
+            } else {
+                doGeneratePlayoffs(standings);
+            }
+        }
+
+        function doGeneratePlayoffs(standings) {
+            state.matches = state.matches.filter(m => m.phase !== 'playoff');
+            let mId = Date.now();
+
+            const top4 = standings.slice(0, 4);
+
+            state.matches.push({
+                id: 'P' + mId++, phase: 'playoff', name: `Semi Final 1`,
+                team1Id: top4[0].id, team2Id: top4[3].id, winnerId: null,
+                scoreT1: 0, scoreT2: 0, games: [], isPlayed: false, scheduledTime: null, bestOf: 3
+            });
+
+            state.matches.push({
+                id: 'P' + mId++, phase: 'playoff', name: `Semi Final 2`,
+                team1Id: top4[1].id, team2Id: top4[2].id, winnerId: null,
+                scoreT1: 0, scoreT2: 0, games: [], isPlayed: false, scheduledTime: null, bestOf: 3
+            });
+
+            state.matches.push({
+                id: 'P' + mId++, phase: 'playoff', name: `Grand Final`,
+                team1Id: null, team2Id: null, winnerId: null,
+                scoreT1: 0, scoreT2: 0, games: [], isPlayed: false, scheduledTime: null, bestOf: 5
+            });
+
+            syncState();
+            showToast("Jadwal Playoff (Top 4) berhasil dibuat!");
+            renderLeague();
+        }
+
+        // --- STREAMING_CHUNK:Implementing Walkover and Match Cancellation Logic ---
         function setWalkover(teamIndex) {
             if (!state.isAdmin || !currentSelectedMatch) return;
             
@@ -1093,7 +1075,7 @@
                 `Anda yakin ingin membatalkan pertandingan ini?<br><br><span class="text-xs text-slate-400">Kedua tim akan dihitung <b>sudah bermain (+1 Main)</b> di klasemen namun <b>tidak mendapatkan poin apapun (0 Poin)</b>.</span>`,
                 () => {
                     currentSelectedMatch.isPlayed = true;
-                    currentSelectedMatch.winnerId = null; // null indicates draw/cancelled
+                    currentSelectedMatch.winnerId = null;
                     currentSelectedMatch.scoreT1 = 0;
                     currentSelectedMatch.scoreT2 = 0;
                     currentSelectedMatch.games = []; 
@@ -1107,7 +1089,30 @@
             );
         }
 
-        // --- STANDINGS CALCULATION LOGIC ---
+        // --- STREAMING_CHUNK:Implementing Match Result Edit and Reset Logic ---
+        function promptResetMatch() {
+            if (!state.isAdmin || !currentSelectedMatch) return;
+            
+            showCustomConfirm(
+                "Reset & Edit Ulang Hasil?",
+                "Tindakan ini akan <b>menghapus skor dan data statistik (MVP/KDA)</b> dari pertandingan ini saja sehingga Anda bisa menginput ulang data yang benar. Poin klasemen akan otomatis disesuaikan kembali. Lanjutkan?",
+                () => {
+                    currentSelectedMatch.isPlayed = false;
+                    currentSelectedMatch.winnerId = null;
+                    currentSelectedMatch.scoreT1 = 0;
+                    currentSelectedMatch.scoreT2 = 0;
+                    currentSelectedMatch.games = [];
+                    
+                    syncState();
+                    showToast("Hasil pertandingan berhasil direset. Silakan input ulang!");
+                    renderLeague();
+                    renderStats();
+                    refreshModalState();
+                }
+            );
+        }
+
+        // --- STREAMING_CHUNK:Implementing Standings Calculation Logic ---
         function calculateStandings() {
             const statsMap = {};
             
@@ -1126,7 +1131,6 @@
                 const s2 = statsMap[m.team2Id];
                 if (!s1 || !s2) return;
 
-                // Match is played, increment "Main" for both
                 s1.played++; s2.played++;
                 s1.gameWins += m.scoreT1; s1.gameLosses += m.scoreT2;
                 s2.gameWins += m.scoreT2; s2.gameLosses += m.scoreT1;
@@ -1140,7 +1144,6 @@
                     if (m.scoreT2 === 2 && m.scoreT1 === 0) { s2.points += 2; s1.points -= 2; }
                     else if (m.scoreT2 === 2 && m.scoreT1 === 1) { s2.points += 1; s1.points -= 1; }
                 }
-                // If m.winnerId === null (Draw/Cancel), they get 0 points, W/L remains unchanged.
             });
 
             return Object.values(statsMap).sort((a, b) => {
@@ -1152,7 +1155,7 @@
             });
         }
 
-        // --- UI UTILS & MODALS ---
+        // --- STREAMING_CHUNK:Implementing App Core Utilities ---
         function saveDeadline() {
             const input = document.getElementById('admin-deadline-input').value;
             if(input) {
@@ -1248,7 +1251,7 @@
         }
         document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
 
-        // --- CUSTOM CONFIRM UI SYSTEM ---
+        // --- STREAMING_CHUNK:Implementing Modal Management System ---
         function showCustomConfirm(title, message, callback) {
             document.getElementById('confirm-title').innerHTML = `<i class="fa-solid fa-triangle-exclamation text-brand-magenta"></i> ${title}`;
             document.getElementById('confirm-message').innerHTML = message;
@@ -1258,7 +1261,7 @@
             const box = document.getElementById('custom-confirm-box');
             
             modal.classList.remove('hidden');
-            void modal.offsetWidth; // Trigger reflow
+            void modal.offsetWidth; 
             modal.classList.remove('opacity-0');
             box.classList.remove('scale-95');
         }
@@ -1281,7 +1284,6 @@
             closeCustomConfirm();
         });
 
-        // Copy Text Function
         function copyText(text, successMsg) {
             const textArea = document.createElement("textarea");
             textArea.value = text;
@@ -1323,6 +1325,7 @@
             }, 3000);
         }
 
+        // --- STREAMING_CHUNK:Implementing Team Registration Handlers ---
         function renderRegistrationForm() {
             const container = document.getElementById('players-container');
             container.innerHTML = '';
@@ -1438,7 +1441,7 @@
             }, 300);
         }
 
-        // --- TEAM DELETE & RESET ---
+        // --- STREAMING_CHUNK:Implementing Database Population Backups ---
         function restoreExtractedTeams() {
             if (!state.isAdmin) return;
 
@@ -1521,7 +1524,7 @@
 
             showCustomConfirm(
                 "Pulihkan 7 Tim ke Database?",
-                "Sistem akan otomatis menginput seluruh anggota dari 7 tim: wrong way sheep, Abangkuuuuu, BEGADANG 45, ManadoAja, DG Koro, TOMA, ATTITUDE REPORT. Lanjutkan?",
+                "Sistem akan otomatis menginput seluruh anggota dari 7 tim ke dalam sistem. Lanjutkan?",
                 function() {
                     let added = 0;
                     backupTeams.forEach(bt => {
@@ -1543,6 +1546,7 @@
             );
         }
 
+        // --- STREAMING_CHUNK:Implementing Database Reset and Cleanup ---
         function promptResetData() {
             if (!state.isAdmin) return;
             showCustomConfirm(
@@ -1564,7 +1568,6 @@
 
         function deleteTeam(teamId) {
             if (!state.isAdmin) return;
-
             const teamObj = state.teams.find(t => t.id === teamId);
             if (!teamObj) return;
 
@@ -1573,12 +1576,10 @@
                 `Apakah Anda yakin ingin membatalkan dan menghapus pendaftaran tim <span class="font-bold text-brand-magenta">"${teamObj.name}"</span>?`,
                 function() {
                     state.teams = state.teams.filter(t => t.id !== teamId);
-                    
                     state.matches.forEach(m => {
                         if (m.team1Id === teamId) m.team1Id = null;
                         if (m.team2Id === teamId) m.team2Id = null;
                     });
-
                     syncState();
                     updateQuotaUI();
                     renderTeams();
@@ -1588,6 +1589,7 @@
             );
         }
 
+        // --- STREAMING_CHUNK:Rendering Teams Roster ---
         function renderTeams() {
             const grid = document.getElementById('teams-grid');
             grid.innerHTML = '';
@@ -1656,8 +1658,8 @@
             return state.teams.find(t => t.id === teamId);
         }
 
+        // --- STREAMING_CHUNK:Rendering League Matches and Standings ---
         function renderLeague() {
-            // Render Standings
             const standingsData = calculateStandings();
             const tbody = document.getElementById('standings-body');
             tbody.innerHTML = '';
@@ -1687,7 +1689,6 @@
                 });
             }
 
-            // Render Match Schedule
             const leagueGrid = document.getElementById('league-grid');
             const playoffGrid = document.getElementById('playoff-grid');
             const playoffContainer = document.getElementById('schedule-playoff-container');
@@ -1696,11 +1697,9 @@
             playoffGrid.innerHTML = '';
 
             const sortMatchesFn = (a, b) => {
-                // 1. Tarik yang sudah "Selesai" (isPlayed) ke atas
                 if (a.isPlayed && !b.isPlayed) return -1;
                 if (!a.isPlayed && b.isPlayed) return 1;
                 
-                // 2. Kemudian urutkan berdasarkan waktu/jam tanding
                 const timeA = a.scheduledTime ? new Date(a.scheduledTime).getTime() : Infinity;
                 const timeB = b.scheduledTime ? new Date(b.scheduledTime).getTime() : Infinity;
                 return timeA - timeB;
@@ -1723,6 +1722,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Generating HTML for Match Cards ---
         function createMatchCardHTML(match) {
             const t1 = getTeam(match.team1Id);
             const t2 = getTeam(match.team2Id);
@@ -1788,6 +1788,7 @@
             `;
         }
 
+        // --- STREAMING_CHUNK:Opening Match Management Modal ---
         function openMatchModal(matchId) {
             currentSelectedMatch = state.matches.find(m => m.id === matchId);
             if (!currentSelectedMatch) return;
@@ -1808,8 +1809,6 @@
 
             selT1.value = currentSelectedMatch.team1Id || "";
             selT2.value = currentSelectedMatch.team2Id || "";
-
-            // League & Generated Playoffs lock the teams (Admin shouldn't change matchups manually if generated)
             selT1.disabled = true;
             selT2.disabled = true;
 
@@ -1831,12 +1830,20 @@
             refreshModalState();
         }
 
+        // --- STREAMING_CHUNK:Refreshing Match Modal Interactivity State ---
         function refreshModalState() {
             const formArea = document.getElementById('match-form-area');
             const waArea = document.getElementById('wa-reminder-section');
             const woControls = document.getElementById('walkover-controls');
+            const btnReset = document.getElementById('btn-reset-match');
             const t1 = getTeam(currentSelectedMatch.team1Id);
             const t2 = getTeam(currentSelectedMatch.team2Id);
+
+            if (currentSelectedMatch.isPlayed && state.isAdmin) {
+                if(btnReset) btnReset.classList.remove('hidden');
+            } else {
+                if(btnReset) btnReset.classList.add('hidden');
+            }
 
             if (t1 && t2 && currentSelectedMatch.scheduledTime && !currentSelectedMatch.isPlayed) {
                 waArea.classList.remove('hidden');
@@ -1855,7 +1862,6 @@
                 let sT1 = 0, sT2 = 0;
                 
                 if (currentSelectedMatch.isPlayed && currentSelectedMatch.games.length === 0) {
-                    // Match has been played but 0 games means it was a WO or Cancelled
                     sT1 = currentSelectedMatch.scoreT1;
                     sT2 = currentSelectedMatch.scoreT2;
                 } else {
@@ -1874,7 +1880,6 @@
                 const matchFormat = currentSelectedMatch.bestOf || 3;
                 document.getElementById('display-match-format').textContent = 'BO' + matchFormat;
                 
-                // Show Walkover options only if not played yet and user is admin
                 if (currentSelectedMatch.isPlayed || !state.isAdmin) {
                     if (woControls) woControls.classList.add('hidden');
                 } else {
@@ -1896,7 +1901,7 @@
                 };
 
                 const showTab = (num) => {
-                    if (currentSelectedMatch.isPlayed && currentSelectedMatch.games.length === 0) return false; // WO/Cancel scenario, hide tabs
+                    if (currentSelectedMatch.isPlayed && currentSelectedMatch.games.length === 0) return false;
                     if (currentSelectedMatch.games.length >= num) return true;
                     if (currentSelectedMatch.games.length === num - 1) { 
                         if (sT1 < targetWins && sT2 < targetWins) return true; 
@@ -1931,6 +1936,7 @@
             }
         }
         
+        // --- STREAMING_CHUNK:Rendering individual game stats entry ---
         function renderGameTab(gameIndex) {
             currentActiveGame = gameIndex;
             
@@ -1976,6 +1982,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Handling Schedule saving and WhatsApp reminders ---
         function saveMatchSchedule() {
             if (!state.isAdmin) return;
             if(!currentSelectedMatch) return;
@@ -2009,16 +2016,24 @@
             copyText(text, "Teks reminder disalin! Silakan Paste di Grup WA.");
         }
 
-        function shareAllScheduleWA() {
+        // --- STREAMING_CHUNK:Generating WhatsApp shares for Schedule and Results ---
+        function shareAllScheduleWA(includePlayed = true) {
             if (state.matches.length === 0) {
                 showToast("Belum ada jadwal pertandingan yang dibuat!", true);
                 return;
             }
 
-            let text = `🏆 *JADWAL & HASIL MLBB AJA CUP* 🏆\n\n`;
-            
-            const playoffMatches = state.matches.filter(m => m.phase === 'playoff');
-            const leagueMatches = state.matches.filter(m => m.phase === 'league');
+            const playoffMatches = state.matches.filter(m => m.phase === 'playoff' && (includePlayed || !m.isPlayed));
+            const leagueMatches = state.matches.filter(m => m.phase === 'league' && (includePlayed || !m.isPlayed));
+
+            if (!includePlayed && playoffMatches.length === 0 && leagueMatches.length === 0) {
+                showToast("Semua pertandingan sudah selesai dimainkan!", true);
+                return;
+            }
+
+            let text = includePlayed 
+                ? `🏆 *JADWAL & HASIL MLBB AJA CUP* 🏆\n\n`
+                : `🏆 *SISA JADWAL MLBB AJA CUP* 🏆\n*(Hanya pertandingan yang belum dimainkan)*\n\n`;
 
             const formatMatchesGrouped = (matches) => {
                 const grouped = {};
@@ -2088,7 +2103,8 @@
 
             text += `🌐 *Cek Klasemen Live di:* https://mlbb-aja.vercel.app/`;
 
-            copyText(text, "Jadwal dikelompokkan berdasarkan waktu & disalin! Silakan Paste di Grup WA.");
+            const toastMsg = includePlayed ? "Semua Jadwal & Hasil disalin!" : "Sisa Jadwal (Belum Main) disalin!";
+            copyText(text, toastMsg + " Silakan Paste di Grup WA.");
         }
 
         function shareMatchResultWA(matchId) {
@@ -2145,6 +2161,7 @@
             currentSelectedMatch = null;
         }
 
+        // --- STREAMING_CHUNK:Building Player Checkboxes and Input Validation ---
         function handlePlayerCheckbox(cb) {
             const table = cb.closest('table');
             const checkedCount = table.querySelectorAll('.player-checkbox:checked').length;
@@ -2206,6 +2223,7 @@
             });
         }
 
+        // --- STREAMING_CHUNK:Implementing Random Match Stats Generator ---
         function generateRandomStats() {
             const isT1Win = Math.random() > 0.5;
             const winnerId = isT1Win ? currentSelectedMatch.team1Id : currentSelectedMatch.team2Id;
@@ -2273,6 +2291,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Implementing Match Saving and Verification Logic ---
         function saveGameResult() {
             if (!state.isAdmin) return;
 
@@ -2284,11 +2303,6 @@
 
             const mvpRadio1 = document.querySelector('input[name="mvp-radio-1"]:checked');
             const mvpRadio2 = document.querySelector('input[name="mvp-radio-2"]:checked');
-
-            if(!mvpRadio1 && !mvpRadio2) {
-                showToast("Pilih minimal 1 pemain sebagai MVP di game ini!", true);
-                return;
-            }
 
             const mvpIgn1 = mvpRadio1 ? mvpRadio1.value : null;
             const mvpIgn2 = mvpRadio2 ? mvpRadio2.value : null;
@@ -2342,7 +2356,6 @@
                 currentSelectedMatch.isPlayed = true;
                 currentSelectedMatch.winnerId = sT1 === targetWins ? currentSelectedMatch.team1Id : currentSelectedMatch.team2Id;
 
-                // Handle advance logic for Playoff Semi-Finals
                 if (currentSelectedMatch.phase === 'playoff' && currentSelectedMatch.name.includes('Semi Final')) {
                     const grandFinal = state.matches.find(m => m.name === 'Grand Final');
                     if(grandFinal) {
@@ -2363,6 +2376,7 @@
             }
         }
 
+        // --- STREAMING_CHUNK:Rendering Detailed Statistics and Player Leaderboard ---
         function renderStats() {
             const tbody = document.getElementById('leaderboard-body');
             const historyContainer = document.getElementById('match-history-container');
@@ -2496,6 +2510,7 @@
             });
         }
 
+        // --- STREAMING_CHUNK:Managing Connection Status and Synchronization ---
         function setCloudStatus(isOnline) {
             const indicators = [document.getElementById('cloud-sync-indicator'), document.getElementById('mobile-cloud-indicator')];
             indicators.forEach(el => {
@@ -2593,6 +2608,7 @@
                         if(data.matches) window.state.matches = data.matches;
                         if(data.registrationDeadline !== undefined) window.state.registrationDeadline = data.registrationDeadline;
                         
+                        // Buka Gembok Keamanan (Safety Lock Released)
                         window.state.isDataLoaded = true;
                         
                         if(window.renderTeams) window.renderTeams();
@@ -2605,6 +2621,7 @@
                             if(window.currentSelectedMatch) window.refreshModalState();
                         }
                     } else {
+                        // Jika dokumen belum ada, buka gembok dan buat dokumen baru
                         window.state.isDataLoaded = true;
                         setDoc(stateDocRef, {
                             teams: window.state.teams,
